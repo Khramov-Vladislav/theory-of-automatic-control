@@ -120,7 +120,7 @@
 
         \noindent
         \begin{minipage}[t]{\textwidth}
-            \raggedright Принял преподаватель \hfill
+            \raggedright Принял к.т.н. \hfill
             \underline{\hspace{3cm}}  Терешин В.А.
         \end{minipage}
     \end{center}
@@ -334,11 +334,11 @@ $M_{dpr}=M_d i;$ сигнала управления $u(t)$.
 Подставляя выражения для ошибок \(\psi_p\) и \(\psi_m\), получаем:
 \[
     u(t)=
-    -k\left(\varphi_m-\varphi^*\right)
-    -k\left(
+    -k_p k\left(\varphi_m-\varphi^*\right)
+    -k_d k\left(
     \frac{\dot{\varphi}_p}{i}
     \right)
-    -k\int_0^t
+    -k_i k\int_0^t
     \left(
     \varphi_m(\tau)-\varphi^*
     \right)d\tau.
@@ -435,10 +435,14 @@ $\varphi^*(t)=\text{const}$ установившаяся ошибка равна
 Уравнение ПИД-регулятора в операторной форме:
 \[
     U(s)=
-    -k\Phi_m(s)
-    +k\Phi^*(s)
-    -\frac{ks}{i}\Phi_p(s)
-    -\frac{k}{s}
+    -k_p k\left(\Phi_m(s)-\Phi^*(s)\right)
+    -k_d k\,s
+    \left(
+    \frac{\Phi_p(s)}{i}
+    -\Phi^*(s)
+    \right)
+    -k_i k
+    \frac{1}{s}
     \left(
     \Phi_m(s)-\Phi^*(s)
     \right).
@@ -480,96 +484,65 @@ $\varphi^*(t)=\text{const}$ установившаяся ошибка равна
 \]
 — вектор неизвестных функций.
 
-При подстановке $\text{Кпр}=1$, $k_p=k_d=k_i=1$
-уравнение регулятора умножается на $s$ и принимает вид:
+Для сохранения общности оставим коэффициенты \(k_p, k_d, k_i\)
+в явном виде. Умножим уравнение~(1.13) на \(s\):
 \[
     sU(s)=
-    -ks\Phi_m(s)
-    +ks\Phi^*(s)
-    -\frac{ks^2}{i}\Phi_p(s)
-    -k\Phi_m(s)
-    +k\Phi^*(s).
+    -k_p k s\bigl(\Phi_m(s)-\Phi^*(s)\bigr)
+    -k_d k \frac{s^2}{i}\Phi_p(s)
+    -k_i k\bigl(\Phi_m(s)-\Phi^*(s)\bigr).
     \tag{1.13a}
 \]
-
 Теперь выпишем систему уравнений в стандартном линейном виде.
 
 Из уравнения (1.9):
 \[
-    J_d s^2\Phi_p
-    +
-    \frac{1}{i}M_m
-    -
-    M_d
-    =
-    0.
+    J_d s^2\Phi_p + \frac{1}{i}M_m - M_d = 0.
 \]
-
 Из уравнения (1.10):
 \[
-    J_M s^2\Phi_m
-    -
-    M_m
-    =
-    0.
+    J_M s^2\Phi_m - M_m = 0.
 \]
-
 Из уравнения (1.11):
 \[
-    -\frac{c+bs}{i}\Phi_p
-    +
-    (c+bs)\Phi_m
-    -
-    M_m
-    =
-    0.
+    -\frac{c+bs}{i}\Phi_p + (c+bs)\Phi_m - M_m = 0.
 \]
-
 Из уравнения (1.12):
 \[
-    \sigma s\Phi_p
-    +
-    (\tau s+1)M_d
-    -
-    rU
-    =
-    0.
+    \sigma s\Phi_p + (\tau s+1)M_d - rU = 0.
 \]
-
 Из уравнения (1.13a):
 \[
-    \frac{ks^2}{i}\Phi_p
+    \frac{k_d k s^2}{i}\Phi_p
     +
-    k(s+1)\Phi_m
+    (k_p k s + k_i k)\Phi_m
     +
     sU
     =
-    k(s+1)\Phi^*(s).
+    (k_p k s + k_i k)\Phi^*(s).
 \]
-
 Следовательно, матрица коэффициентов \(A(s)\) имеет вид:
 \[
     A(s)=
     \begin{pmatrix}
-        J_d s^2          & 0       & \dfrac{1}{i} & -1       & 0  \\[3mm]
-
-        0                & J_M s^2 & -1           & 0        & 0  \\[3mm]
-
-        -\dfrac{c+bs}{i} & c+bs    & -1           & 0        & 0  \\[3mm]
-
-        \sigma s         & 0       & 0            & \tau s+1 & -r \\[3mm]
-
-        \dfrac{ks^2}{i}  & k(s+1)  & 0            & 0        & s
+        J_d s^2              & 0               & \dfrac{1}{i} & -1       & 0  \\[3mm]
+        0                    & J_M s^2         & -1           & 0        & 0  \\[3mm]
+        -\dfrac{c+bs}{i}     & c+bs            & -1           & 0        & 0  \\[3mm]
+        \sigma s             & 0               & 0            & \tau s+1 & -r \\[3mm]
+        \dfrac{k_d k s^2}{i} & k_p k s + k_i k & 0            & 0        & s
     \end{pmatrix}.
 \]
-
 Вектор правой части:
 \[
     B(s)=
     \begin{pmatrix}
-        0 \\ 0 \\ 0 \\ 0 \\ k(s+1)
+        0 \\ 0 \\ 0 \\ 0 \\ k_p k s + k_i k
     \end{pmatrix}.
 \]
+Для варианта 70 коэффициенты ПИД-регулятора равны единице:
+\(k_p = k_d = k_i = 1\), \(\text{Кпр}=1\).
+После подстановки этих значений получим матрицу,
+использованную при дальнейших расчётах.
 
 Передаточная функция системы по выходному углу определяется выражением:
 \[
@@ -773,10 +746,19 @@ $\varphi^*(t)=\text{const}$ установившаяся ошибка равна
 \]
 \[
     U=
-    -k(\Phi_m-\Phi^*)
-    -\frac{ks}{i}\Phi_p
-    -\frac{k}{s}
-    (\Phi_m-\Phi^*).
+    -k_pk(\Phi_m-\Phi^*)
+    -k_dk\,s
+    \left(
+    \frac{\Phi_p}{i}
+    -\Phi^*
+    \right)
+    -k_ik
+    \frac{1}{s}
+    (\Phi_m-\Phi^*)
+\]
+Для варианта 70 далее принимается
+\[
+    k_p=k_d=k_i=1.
 \]
 
 Исключая промежуточные переменные
@@ -1013,9 +995,9 @@ $\varphi^*(t)=\text{const}$ установившаяся ошибка равна
 В системе используется ПИД-регулятор, поэтому закон управления содержит пропорциональную, дифференциальную и интегральную составляющие:
 \[
     U(s)=
-    -k(\Phi_m-\Phi^*)
-    -\frac{k}{i}\dot{\varphi}_p
-    -k\int_0^t(\varphi_m-\varphi^*)d\tau.
+    -k_p k(\Phi_m-\Phi^*)
+    -k_d\frac{k}{i}\dot{\varphi}_p
+    -k_i k\int_0^t(\varphi_m-\varphi^*)d\tau.
 \]
 
 Таким образом, интегральная составляющая регулятора обеспечивает астатизм системы и отсутствие установившейся ошибки.
@@ -1023,9 +1005,15 @@ $\varphi^*(t)=\text{const}$ установившаяся ошибка равна
 В изображениях Лапласа:
 \[
     U(s)=
-    -k(\Phi_m-\Phi^*)
-    -\frac{ks}{i}\Phi_p
-    -\frac{k}{s}(\Phi_m-\Phi^*).
+    -k_pk(\Phi_m-\Phi^*)
+    -k_dk\,s
+    \left(
+    \frac{\Phi_p}{i}
+    -\Phi^*
+    \right)
+    -k_ik
+    \frac{1}{s}
+    (\Phi_m-\Phi^*)
 \]
 
 Задающее воздействие принимается ступенчатым:
@@ -1136,9 +1124,9 @@ $\varphi^*(t)=\text{const}$ установившаяся ошибка равна
 Управляющее напряжение формируется ПИД-регулятором:
 \[
     U(s)=
-    -k(\Phi_m-\Phi^*)
-    -\frac{k}{i}\dot{\varphi}_p
-    -k\int_0^t(\varphi_m-\varphi^*)d\tau.
+    -k_p k(\Phi_m-\Phi^*)
+    -k_d\frac{k}{i}\dot{\varphi}_p
+    -k_i k\int_0^t(\varphi_m-\varphi^*)d\tau.
 \]
 
 Согласно техническому заданию:
